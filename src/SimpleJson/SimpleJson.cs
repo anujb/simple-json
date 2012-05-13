@@ -1745,7 +1745,12 @@ namespace SimpleJson
                     }
                 }
 #else
+#if PORTABLE
+                var ctor = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                ConstructorInfo constructorInfo = ctor.Length > 0 ? ctor[0] : null;
+#else
                 ConstructorInfo constructorInfo = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+#endif      
 #endif
                 c = delegate { return constructorInfo.Invoke(null); };
                 ConstructorCache.Add(type, c);
@@ -1843,7 +1848,7 @@ namespace SimpleJson
 #if NETFX_CORE
                 return delegate(object instance) { return getMethodInfo.Invoke(instance, new Type[] { }); };
 #else
-                return delegate(object instance) { return getMethodInfo.Invoke(instance, Type.EmptyTypes); };
+                return delegate(object instance) { return getMethodInfo.Invoke(instance, new Type[] {}); };
 #endif
 #endif
             }
